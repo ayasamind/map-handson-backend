@@ -1,0 +1,56 @@
+name: Run tests
+
+on:
+  push:
+
+concurrency:
+  group: test-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  execute-test:
+    runs-on: ubuntu-latest
+    env:
+      APP_DEBUG: true
+      APP_ENV: testing
+    services:
+      mysql:
+        image: mysql:8.0
+        ports:
+          - 3306:3306
+        env:
+          MYSQL_ALLOW_EMPTY_PASSWORD: yes
+          MYSQL_ROOT_PASSWORD: root
+          MYSQL_DATABASE: testing
+          MYSQL_USER: testing
+          MYSQL_PASSWORD: testing
+          MYSQL_ROOT_HOST: "%"
+        options: --health-cmd "mysqladmin ping" --health-interval 20s --health-timeout 10s --health-retries 10
+    steps:
+      - uses: actions/checkout@v3
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2'
+          extensions: pdo_mysql
+      - name: Modify database settings
+        run: |
+          mysql -h 127.0.0.1 --port 3306 -u root -proot -e "ALTER DATABASE testing CHARACTER SET utf8mb4 COLLATE 'utf8mb4_unicode_ci'"
+      - name: Get Composer Cache Directory
+        id: composer-cache
+        run: |
+          echo "::set-output name=dir::$(composer config cache-files-dir)"
+      - uses: actions/cache@v3
+        with:
+          path: ${{ steps.composer-cache.outputs.dir }}
+          key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-composer-cache_expire
+      - run: composer install -n --prefer-dist
+      - run: cp .env.ci-testing .env.testing
+      - run: php artisan key:generate
+      - run: php artisan config:clear
+      - run: php artisan migrate --seed
+      - name: Run Static Code Static Analysis
+        run: ./vendor/bin/phpstan analyse --xdebug
+      - name: Run Unit Test
+        run: ./vendor/bin/phpunit

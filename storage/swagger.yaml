@@ -1,0 +1,74 @@
+openapi: 3.0.0
+info:
+  title: 'Map Maker API'
+  version: 0.0.1
+paths:
+  /api/health:
+    get:
+      description: 疎通確認
+      operationId: Health
+      responses:
+        '200':
+          description: HTTPステータスを返す
+          content:
+            application/json:
+              schema:
+                properties:
+                  status: { description: ステータス, type: integer }
+                type: object
+  '/api/maps/{mapId}':
+    get:
+      description: マップ詳細
+      operationId: 'Map Details'
+      parameters:
+        -
+          name: pin
+          in: query
+          description: ピン名
+          schema:
+            type: string
+      responses:
+        '200':
+          description: マップ詳細
+          content:
+            application/json:
+              schema:
+                properties:
+                  title: { description: マップのタイトル, type: string }
+                  description: { description: マップの概要, type: string }
+                  pins: { description: ピン, properties: { title: { description: ピンのタイトル, type: string }, description: { description: ピンの概要, type: string }, lat: { description: ピンの緯度, type: number, format: double }, lon: { description: ピンの経度, type: number, format: double } }, type: object }
+                  center_lat: { description: 中心の緯度, type: number, format: double }
+                  center_lon: { description: 中心の経度, type: number, format: double }
+                  zoom_level: { description: ズームレベル, type: integer }
+                type: object
+  /api/pins/create:
+    post:
+      tags:
+        - ピンの作成処理
+      description: ピンを新規登録する
+      operationId: 'POST::/api/pins/create::App\Http\Controllers\PinController::create'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              properties:
+                map_id:
+                  description: マップのID
+                  type: integer
+                pins:
+                  type: array
+                  items: { properties: { title: { description: ピンのタイトル, type: string }, description: { description: ピンの概要, type: string, nullable: true }, lat: { description: ピンの緯度, type: number, format: double }, lon: { description: ピンの経度, type: number, format: double } }, type: object }
+              type: object
+      responses:
+        '200':
+          description: 'Items created successfully'
+          content:
+            application/json:
+              schema:
+                properties:
+                  message: { description: メッセージ, type: string }
+                  pins: { description: ピンのリスト, type: array, items: { properties: { title: { description: ピンのタイトル, type: string }, description: { description: ピンの概要, type: string }, lat: { description: ピンの緯度, type: number, format: double }, lon: { description: ピンの経度, type: number, format: double } }, type: object } }
+                type: object
+        '422':
+          description: 'Invalid input'
