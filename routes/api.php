@@ -18,6 +18,6 @@ use Illuminate\Support\Facades\Route;
 
 Route::get('/health', HealthController::class);
 
-// Route::get('/maps', [MapController::class, 'index']);
-// Route::get('/maps/{mapId}', [MapController::class, 'show']);
-// Route::post('/pins/create', [PinController::class, 'create']);
+Route::get('/maps', [MapController::class, 'index']);
+Route::get('/maps/{mapId}', [MapController::class, 'show']);
+Route::post('/pins/create', [PinController::class, 'create']);
