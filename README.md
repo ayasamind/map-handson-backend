@@ -3,12 +3,20 @@
 ## 環境構築
 
 ```
+$ cp .env.dev .env
+
 $ docker run --rm \
     -u "$(id -u):$(id -g)" \
     -v $(pwd):/var/www/html \
     -w /var/www/html \
     laravelsail/php82-composer:latest \
     composer install --ignore-platform-reqs
+
+$ docker-compose up -d
+
+http://localhost:8888/ にアクセス
+
+http://localhost:8888/api/health にアクセス
 ```
 
 
