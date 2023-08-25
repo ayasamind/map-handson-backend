@@ -22,7 +22,7 @@ class MapFactory extends Factory
             'description' => fake()->realText(),
             'center_lat' => fake()->latitude(),
             'center_lon' => fake()->longitude(),
-            'zoom_level' => ZoomLevel::DEFAULT,
+            'zoom_level' => 1,
         ];
     }
 }
