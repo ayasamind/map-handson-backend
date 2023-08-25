@@ -18,7 +18,7 @@ return new class extends Migration
             $table->text('description')->comment('マップの概要');
             $table->double('center_lat', 8, 6)->comment('中心の緯度');
             $table->double('center_lon', 9, 6)->comment('中心の経度');
-            $table->integer('zoom_level')->default(ZoomLevel::DEFAULT)->comment('ズームレベル');
+            $table->integer('zoom_level')->default(1)->comment('ズームレベル');
             $table->timestamps();
         });
     }
